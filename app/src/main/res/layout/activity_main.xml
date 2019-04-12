@@ -23,12 +23,14 @@
         android:orientation="horizontal">
 
         <RadioButton
+            android:id="@+id/noNetwork"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="@string/none" />
 
         <RadioButton
+            android:id="@+id/anyNetwork"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/any" />
@@ -43,15 +45,15 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/schedule_job"
-        android:onClick="sheduleJob"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="4dp"/>
+        android:layout_margin="4dp"
+        android:onClick="scheduleJob"
+        android:text="@string/schedule_job" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/cancel_jobs"
-        android:onClick="cancelJobs"/>
+        android:onClick="cancelJobs"
+        android:text="@string/cancel_jobs" />
 
 </LinearLayout>
