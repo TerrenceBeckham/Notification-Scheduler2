@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Notification Scheduler 2</string>
+    <string name="job_service">Job Service</string>
+    <string name="job_ran_to_completion">Your job ran to completion!</string>
 </resources>
