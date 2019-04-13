@@ -26,12 +26,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //SeekBar
+        mSeekBar = findViewById(R.id.seekBar);
         final TextView seekBarProgress = findViewById(R.id.seekBarProgress);
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (i > 0) {
-                    seekBarProgress.setText(i + " s");
+                if (progress > 0) {
+                    seekBarProgress.setText(progress + " s");
                 } else {
                     seekBarProgress.setText(getString(R.string.progress_bar_text_not_set));
                 }
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     public void scheduleJob(View view) {
         mScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
         RadioGroup netWorkOptions = findViewById(R.id.networkOptions);
+        int seekBarInteger = mSeekBar.getProgress();
+        boolean seekBarSet = seekBarInteger > 0;
         //get selected netWork id
         int selectNetworkID = netWorkOptions.getCheckedRadioButtonId();
 
@@ -79,10 +82,16 @@ public class MainActivity extends AppCompatActivity {
                 .setRequiredNetworkType(selectedNetworkOption)
                 .setRequiresDeviceIdle(mDeviceIdleSwitch.isChecked())
                 .setRequiresCharging(mDeviceChargingSwitch.isChecked());
+        //Set the overrideDealine if the seekBar is greater than 0
+        if (seekBarSet) {
+            builder.setOverrideDeadline(seekBarInteger * 1000);
+        }
 
         boolean constraintSet = (selectedNetworkOption != JobInfo.NETWORK_TYPE_NONE)
                 || mDeviceChargingSwitch.isChecked()
-                || mDeviceIdleSwitch.isChecked();
+                || mDeviceIdleSwitch.isChecked()
+                || seekBarSet;
+
 
         if (constraintSet) {
             //schedule the job and notify the user
