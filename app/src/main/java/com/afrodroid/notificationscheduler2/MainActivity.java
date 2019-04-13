@@ -7,16 +7,49 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private JobScheduler mScheduler;
     public static final int JOB_ID = 0;
+    //switches for setting the job options
+    private Switch mDeviceIdleSwitch;
+    private Switch mDeviceChargingSwitch;
+    private SeekBar mSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //SeekBar
+        final TextView seekBarProgress = findViewById(R.id.seekBarProgress);
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (i > 0) {
+                    seekBarProgress.setText(i + " s");
+                } else {
+                    seekBarProgress.setText(getString(R.string.progress_bar_text_not_set));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        mDeviceIdleSwitch = findViewById(R.id.idleSwitch);
+        mDeviceChargingSwitch = findViewById(R.id.chargingSwitch);
+        mSeekBar = findViewById(R.id.seekBar);
     }
 
     public void scheduleJob(View view) {
@@ -43,13 +76,24 @@ public class MainActivity extends AppCompatActivity {
         ComponentName serviceName = new ComponentName(getPackageName(), NotificationJobService.class.getName());
         JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, serviceName)
                 //call setRequiredNetworkType() on the JobInfoBuilder obj.
-                .setRequiredNetworkType(selectedNetworkOption);
+                .setRequiredNetworkType(selectedNetworkOption)
+                .setRequiresDeviceIdle(mDeviceIdleSwitch.isChecked())
+                .setRequiresCharging(mDeviceChargingSwitch.isChecked());
 
-        //Call schedule() on the JobScheduler object using the build method.
-        JobInfo myJobInfo = builder.build();
-        mScheduler.schedule(myJobInfo);
-        Toast.makeText(this, "Job Scheduled, job will run when" + "The constants are met."
-                ,Toast.LENGTH_SHORT ).show();
+        boolean constraintSet = (selectedNetworkOption != JobInfo.NETWORK_TYPE_NONE)
+                || mDeviceChargingSwitch.isChecked()
+                || mDeviceIdleSwitch.isChecked();
+
+        if (constraintSet) {
+            //schedule the job and notify the user
+            JobInfo myJobInfo = builder.build();
+            mScheduler.schedule(myJobInfo);
+            Toast.makeText(this, "Job Scheduled, job will run when " + "the constaints" +
+                    "are met.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this , "Please set at least on constraint", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     public void cancelJobs(View view) {
